@@ -1,11 +1,13 @@
 package com.isnico.dsl;
 
 import com.isnico.dsl.configure.Configuration;
+import com.isnico.dsl.configure.DefaultConfiguration;
 import com.isnico.dsl.enums.JoinType;
 import com.isnico.dsl.enums.Operate;
 import com.isnico.dsl.tools.ClassUtil;
 import com.isnico.dsl.tools.DFunction;
 import com.isnico.dsl.tools.LambdaUtil;
+import lombok.Data;
 
 import java.lang.invoke.SerializedLambda;
 import java.lang.reflect.Field;
@@ -13,19 +15,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
+@Data
 public class Dsl {
 
-    private Configuration configuration = new Configuration() {
-        @Override
-        public String rewriteTable(Class<?> clazz) {
-            return clazz.getSimpleName().toLowerCase(Locale.ROOT);
-        }
-
-        @Override
-        public String rewriteColumn(Field field) {
-            return field.getName();
-        }
-    };
+    private Configuration configuration = new DefaultConfiguration();
 
     public Select select(){
         return new Select();

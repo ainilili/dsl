@@ -113,7 +113,7 @@ public class Condition {
             }else if (value instanceof Number){
                 return value;
             }else{
-                return StringEscapeUtils.escapeJava(value.toString());
+                return "\'" + StringEscapeUtils.escapeJava(value.toString()) + "\'";
             }
         }
     }

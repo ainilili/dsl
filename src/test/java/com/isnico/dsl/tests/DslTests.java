@@ -3,7 +3,15 @@ package com.isnico.dsl.tests;
 import com.isnico.dsl.Column;
 import com.isnico.dsl.Context;
 import com.isnico.dsl.Dsl;
+import com.isnico.dsl.configure.DefaultConfiguration;
+import com.isnico.dsl.session.DefaultResultSetParser;
+import com.isnico.dsl.session.DefaultSqlSession;
+import com.isnico.dsl.session.SqlSession;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import org.junit.Test;
+
+import java.sql.SQLException;
 
 public class DslTests extends Dsl{
 
@@ -63,5 +71,27 @@ public class DslTests extends Dsl{
                 .context();
         System.out.println(context.getSql());
         System.out.println(context.getArgs());
+    }
+
+    @Test
+    public void testSession() throws ClassNotFoundException, IllegalAccessException, SQLException, InstantiationException {
+        Class.forName("com.mysql.cj.jdbc.Driver");
+        HikariConfig hikariConfig = new HikariConfig();
+        hikariConfig.setJdbcUrl("jdbc:mysql://127.0.0.1:3306/test?characterEncoding=UTF-8");
+        hikariConfig.setUsername("root");
+        hikariConfig.setPassword("root");
+        hikariConfig.addDataSourceProperty("cachePrepStmts", "true");
+        hikariConfig.addDataSourceProperty("prepStmtCacheSize", "250");
+        hikariConfig.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
+        HikariDataSource ds = new HikariDataSource(hikariConfig);
+
+        DefaultSqlSession sqlSession = new DefaultSqlSession();
+        DefaultResultSetParser defaultResultSetParser = new DefaultResultSetParser();
+        defaultResultSetParser.setConfiguration(new DefaultConfiguration());
+        sqlSession.setResultSetParser(defaultResultSetParser);
+        sqlSession.setDataSource(ds);
+
+        User user = sqlSession.selectOne(User.class, select().from(table(User.class)).where(eq(column(User::getId), 1)).context());
+        System.out.println(user.getId());
     }
 }
